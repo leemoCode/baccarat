@@ -8,11 +8,12 @@ declare global {
 }
 
 import { join } from 'path';
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import is_dev from 'electron-is-dev';
 import dotenv from 'dotenv';
 
 import Dm from './modules/dm';
+dotenv.config({ path: join(__dirname, '../../.env') });
 
 // 时间锁配置
 const config = {
@@ -22,24 +23,11 @@ const config = {
 
 let win;
 
-function sendWindowMessage(targetWindow, message, payload) {
-  if (targetWindow) {
-    targetWindow.webContents.send(message, payload);
-  }
-}
-
-dotenv.config({ path: join(__dirname, '../../.env') });
-
-const powerSaveBlocker = require('electron').powerSaveBlocker;
-powerSaveBlocker.start('prevent-display-sleep');
-
-const titleTail = '' + (is_dev ? '_dev' : '');
-
 class createWin {
   // 创建浏览器窗口
   constructor() {
     win = new BrowserWindow({
-      title: 'baccarat' + titleTail,
+      title: 'baccarat' + (is_dev ? '_dev' : ''),
       width: 1500,
       height: 900,
       autoHideMenuBar: true,
@@ -99,6 +87,7 @@ app.whenReady().then(async () => {
     global.dm = new Dm();
   }
 });
+
 app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') {
     app.quit();
