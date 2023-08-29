@@ -1,7 +1,7 @@
 <template>
     <div>
         <div>
-            {{ roundStatus }}
+            {{ roundNumInfo }}
         </div>
 
         <el-button @click="getCards">发牌</el-button>
@@ -36,7 +36,21 @@ export default {
                 // 计算结果
                 caclulateResult();
             }
+            if (oldValue === ROUND_STATUS.FINISH && newValue === ROUND_STATUS.PENDING) {
+                roundNum.value += 1;
+            }
         });
+
+        // 当前对局轮数
+        const roundNum = ref(0);
+        // 展示信息
+        const roundNumInfo = computed(() => {
+            if (roundNum.value === 0 && roundStatus.value === ROUND_STATUS.FINISH) {
+                return '';
+            } else {
+                return `第${roundNum.value}局`;
+            }
+        })
 
         const currCards = ref([]);
         const bankerCards = ref([]);
@@ -252,6 +266,7 @@ export default {
         // 提供数据和方法给模板
         return {
             roundStatus,
+            roundNumInfo,
 
             playerCards,
             bankerCards,
