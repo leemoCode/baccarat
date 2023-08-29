@@ -8,11 +8,13 @@ declare global {
 }
 
 import { join } from 'path';
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import is_dev from 'electron-is-dev';
 import dotenv from 'dotenv';
 
 import Dm from './modules/dm';
+import { refreshCard, pushCard } from './modules/card';
+
 dotenv.config({ path: join(__dirname, '../../.env') });
 
 // 时间锁配置
@@ -92,4 +94,15 @@ app.on('window-all-closed', async () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+});
+
+// 监听来自渲染进程的请求
+ipcMain.on('REFRESH_CARD', (event, arg) => {
+  refreshCard()
+  event.sender.send('REFRESH_CARD_SUCCESS');
+});
+
+// 监听来自渲染进程的请求
+ipcMain.on('GET_CARD', (event, arg) => {
+  event.sender.send('GET_CARD_RES', pushCard());
 });

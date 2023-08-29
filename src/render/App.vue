@@ -1,18 +1,21 @@
 <template>
   <div>
-    百家乐
+    <RefreshCard></RefreshCard>
+    <PushCard></PushCard>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
 
-// import Demo from './components/Demo.vue';
+import RefreshCard from './components/RefreshCard.vue';
+import PushCard from './components/PushCard.vue';
 
 export default defineComponent({
   name: 'Template',
   components: {
-    // Demo,
+    RefreshCard,
+    PushCard,
   },
   setup() {
     onMounted(() => {
