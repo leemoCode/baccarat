@@ -1,24 +1,60 @@
 <template>
-    <div>
-        <div>
-            {{ roundNumInfo }}
-        </div>
+    <div class="centered-top-element round-title">
+        {{ roundNumInfo }}
+    </div>
 
-        <el-button @click="getCards">发牌</el-button>
-        <el-button @click="openCards">开牌</el-button>
+    <div v-if="showRoundResult" class="centered-bottom-element round-title" :class="roundResultInfo.class">
+        {{ roundResultInfo.text }}
+    </div>
 
+    <CardsBack v-if="showCardsBack" />
+    <div v-if="showCardsFront" class="centered-element card-list">
+        <CardItem :type="'player'" :text="playerCards[0]" />
+        <CardItem :type="'banker'" :text="bankerCards[0]" />
+        <CardItem :type="'player'" :text="playerCards[1]" />
+        <CardItem :type="'banker'" :text="bankerCards[1]" />
+        <CardItem :type="'player'" v-if="playerCards[2]" :text="playerCards[2]" />
+        <CardItem :type="'banker'" v-if="bankerCards[2]" :text="bankerCards[2]" />
+    </div>
 
-        庄:{{ bankerCards }} {{ bankerScore }}点
-        闲:{{ playerCards }} {{ playerScore }}点
+    庄{{ bankerScore }}点
+    闲{{ playerScore }}点
 
-        <el-button v-if="playerNeedAddCard" @click="playerAddCard">闲补牌</el-button>
-        <el-button v-if="bankerNeedAddCard" @click="bankerAddCard">庄补牌</el-button>
+    <div class="centered-element" v-if="roundStatus === ROUND_STATUS.FINISH && !showRoundResult">
+        <el-tooltip content="发牌" placement="top">
+            <pushIcon @click.stop="getCards" />
+        </el-tooltip>
+    </div>
 
+    <div class="centered-bottom-element"
+        v-if="roundStatus === ROUND_STATUS.PENDING && !playerNeedAddCard && !bankerNeedAddCard">
+        <el-tooltip content="开牌" placement="top">
+            <openIcon @click.stop="openCards" />
+        </el-tooltip>
+    </div>
+
+    <div class="centered-bottom-element" v-if="playerNeedAddCard">
+        <el-tooltip content="闲补牌" placement="top">
+            <playerAddIcon @click.stop="playerAddCard" />
+        </el-tooltip>
+    </div>
+
+    <div class="centered-bottom-element" v-if="bankerNeedAddCard">
+        <el-tooltip content="庄补牌" placement="top">
+            <bankerAddIcon @click.stop="bankerAddCard" />
+        </el-tooltip>
     </div>
 </template>
     
 <script>
 import { ref, onMounted, nextTick, computed, watch } from 'vue';
+import CardsBack from './CardsBack.vue';
+import CardItem from './CardItem.vue';
+import pushIcon from './icon/pushIcon.vue';
+import openIcon from './icon/openIcon.vue';
+import bankerAddIcon from './icon/bankerAddIcon.vue';
+import playerAddIcon from './icon/playerAddIcon.vue';
+
 const { ipcRenderer } = require('electron');
 
 const ROUND_STATUS = {
@@ -27,30 +63,55 @@ const ROUND_STATUS = {
 }
 
 export default {
+    components: {
+        CardItem,
+        CardsBack,
+        pushIcon,
+        openIcon,
+        playerAddIcon,
+        bankerAddIcon,
+    },
     setup() {
         const roundStatus = ref(ROUND_STATUS.FINISH);
 
         watch(roundStatus, (newValue, oldValue) => {
-            console.log(oldValue, newValue);
             if (oldValue === ROUND_STATUS.PENDING && newValue === ROUND_STATUS.FINISH) {
                 // 计算结果
                 caclulateResult();
             }
-            if (oldValue === ROUND_STATUS.FINISH && newValue === ROUND_STATUS.PENDING) {
-                roundNum.value += 1;
-            }
         });
 
+        const showCardsBack = ref(false);
+        const showCardsFront = ref(false);
+        const showRoundResult = ref(false);
+
         // 当前对局轮数
-        const roundNum = ref(0);
+        const roundNum = ref(1);
         // 展示信息
         const roundNumInfo = computed(() => {
-            if (roundNum.value === 0 && roundStatus.value === ROUND_STATUS.FINISH) {
-                return '';
-            } else {
-                return `第${roundNum.value}局`;
-            }
+            return `ROUND ${roundNum.value}`;
         })
+
+        const roundResultInfo = computed(() => {
+            const res = { text: '', class: '' };
+
+            if (bankerScore.value > playerScore.value) {
+                res.text = 'BANKER WIN';
+                res.class = 'red-result';
+            }
+
+            if (bankerScore.value < playerScore.value) {
+                res.text = 'PLAYER WIN';
+                res.class = 'black-result';
+            }
+
+            if (bankerScore.value === playerScore.value) {
+                res.text = 'DRAW';
+                res.class = 'gray-result';
+            }
+
+            return res;
+        });
 
         const currCards = ref([]);
         const bankerCards = ref([]);
@@ -84,6 +145,8 @@ export default {
                 ipcRenderer.send('GET_CARD');
             }
             roundStatus.value = ROUND_STATUS.PENDING;
+
+            showCardsBack.value = true;
         };
 
         const openCards = () => {
@@ -93,6 +156,9 @@ export default {
 
             bankerCards.value.push(currCards.value[1]);
             bankerCards.value.push(currCards.value[3]);
+
+            showCardsBack.value = false;
+            showCardsFront.value = true;
 
             // 判断是否需要补牌
             if (stopPushCard.value) {
@@ -205,6 +271,14 @@ export default {
             // 存储本轮对局结果
             resultList.value.push(roundResult);
             console.log('结果报表', resultList.value);
+
+            showRoundResult.value = true;
+
+            setTimeout(() => {
+                showRoundResult.value = false;
+                showCardsFront.value = false;
+                roundNum.value += 1;
+            }, 2000);
             return roundResult;
         };
 
@@ -265,8 +339,10 @@ export default {
 
         // 提供数据和方法给模板
         return {
+            ROUND_STATUS,
             roundStatus,
             roundNumInfo,
+            roundResultInfo,
 
             playerCards,
             bankerCards,
@@ -280,8 +356,69 @@ export default {
 
             playerAddCard,
             bankerAddCard,
+
+            showCardsBack,
+            showCardsFront,
+            showRoundResult,
         };
     },
 };
 </script>
+    
+<style scoped>
+.card-list {
+    display: flex;
+}
+
+.round-title {
+    font-size: 48px;
+    font-weight: 550;
+}
+
+.centered-element {
+    position: fixed;
+    /* 使用 fixed 定位元素 */
+    top: 50%;
+    /* 垂直居中，相对于视口的 50% */
+    left: 50%;
+    /* 水平居中，相对于视口的 50% */
+    transform: translate(-50%, -50%);
+    /* 使用 transform 属性来微调元素的位置 */
+}
+
+.centered-bottom-element {
+    position: fixed;
+    /* 使用 fixed 定位元素 */
+    top: 70%;
+    /* 垂直居中，相对于视口的 50% */
+    left: 50%;
+    /* 水平居中，相对于视口的 50% */
+    transform: translate(-50%, -50%);
+    /* 使用 transform 属性来微调元素的位置 */
+}
+
+.centered-top-element {
+    position: fixed;
+    /* 使用 fixed 定位元素 */
+    top: 30%;
+    /* 垂直居中，相对于视口的 50% */
+    left: 50%;
+    /* 水平居中，相对于视口的 50% */
+    transform: translate(-50%, -50%);
+    /* 使用 transform 属性来微调元素的位置 */
+}
+
+.red-result {
+    color: red;
+}
+
+.black-result {
+    color: black;
+}
+
+.gray-result {
+    color: gray;
+}
+</style>
   
+

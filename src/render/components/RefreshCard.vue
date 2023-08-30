@@ -1,28 +1,31 @@
 <template>
-    <div>
-        <el-button v-loading.fullscreen.lock="isLoading" type="primary" @click="startLoading">
-            洗牌
-        </el-button>
+    <div class="reload-container">
+        <el-tooltip content="洗牌" placement="left">
+            <reloadIcon v-loading.fullscreen.lock="isLoading" @click="startLoading" />
+        </el-tooltip>
     </div>
 </template>
-    
+  
 <script>
 import { ref, onMounted } from 'vue';
 import { ElMessage, ElLoading } from 'element-plus'; // 引入Element Plus的消息提示组件
+import reloadIcon from './icon/reloadIcon.vue';
 const { ipcRenderer } = require('electron');
 
 export default {
+    components: {
+        reloadIcon,
+    },
     setup() {
         const isLoading = ref(false);
 
         const startLoading = () => {
             isLoading.value = true;
 
-            // 模拟加载持续2秒钟，然后恢复正常状态
+            // 模拟加载持续n毫秒，然后恢复正常状态
             setTimeout(() => {
                 isLoading.value = false;
 
-                // 使用Element Plus进行消息提示
                 ElMessage({
                     message: '洗牌完毕',
                     type: 'success',
@@ -59,4 +62,19 @@ export default {
     },
 };
 </script>
+  
+<style scoped>
+.reload-container {
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+</style>
   
