@@ -34,9 +34,9 @@ export default {
 }
 
 .card-text {
-    font-size: 48px;
+    font-size: 64px;
     /* 调整字号 */
-    font-weight: bold;
+    font-weight: 600;
     /* 提高字重 */
 }
 
