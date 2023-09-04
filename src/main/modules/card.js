@@ -29,7 +29,7 @@ function refreshCard() {
 }
 
 function pushCard() {
-    console.log('当前牌组', currCardList);
+    console.log('发牌', currCardList[0])
     return currCardList.shift();
 }
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="centered-top-element round-title">
+    <!-- <div class="centered-top-element round-title">
         {{ roundNumInfo }}
     </div>
 
@@ -15,39 +15,44 @@
         <CardItem :type="'banker'" :text="bankerCards[1]" />
         <CardItem :type="'player'" v-if="playerCards[2]" :text="playerCards[2]" />
         <CardItem :type="'banker'" v-if="bankerCards[2]" :text="bankerCards[2]" />
-    </div>
+    </div> -->
 
     庄{{ bankerScore }}点
     闲{{ playerScore }}点
 
     <div class="centered-element" v-if="roundStatus === ROUND_STATUS.FINISH && !showRoundResult">
         <el-tooltip content="发牌" placement="top">
-            <pushIcon @click.stop="getCards" />
+            <!-- <pushIcon @click.stop="getCards" /> -->
+            <div @click="getCards">getCards</div>
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element"
         v-if="roundStatus === ROUND_STATUS.PENDING && !playerNeedAddCard && !bankerNeedAddCard">
         <el-tooltip content="开牌" placement="top">
-            <openIcon @click.stop="openCards" />
+            <!-- <openIcon @click.stop="openCards" /> -->
+            <div @click="openCards">openCards</div>
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="playerNeedAddCard">
         <el-tooltip content="闲补牌" placement="top">
-            <playerAddIcon @click.stop="playerAddCard" />
+            <!-- <playerAddIcon @click.stop="playerAddCard" /> -->
+            <div @click="playerAddCard">playerAddCard</div>
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="bankerNeedAddCard">
         <el-tooltip content="庄补牌" placement="top">
-            <bankerAddIcon @click.stop="bankerAddCard" />
+            <!-- <bankerAddIcon @click.stop="bankerAddCard" /> -->
+            <div @click="bankerAddCard">bankerAddCard</div>
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="showContinueButton">
         <el-tooltip content="下一局" placement="top">
-            <continueIcon @click.stop="goNextRound" />
+            <!-- <continueIcon @click.stop="goNextRound" /> -->
+            <div @click="goNextRound">goNextRound</div>
         </el-tooltip>
     </div>
 </template>
@@ -169,8 +174,12 @@ export default {
             showCardsBack.value = false;
             showCardsFront.value = true;
 
+            console.log('log_首发-闲：', playerCards.value.join(' '), '得分：', playerScore.value);
+            console.log('log_首发-庄：', bankerCards.value.join(' '), '得分：', bankerScore.value);
+
             // 判断是否需要补牌
             if (stopPushCard.value) {
+                console.log('log_停发');
                 roundStatus.value = ROUND_STATUS.FINISH;
 
                 return;
@@ -179,6 +188,10 @@ export default {
             // 闲家补牌逻辑判断
             if (playerScore.value < 6) {
                 playerNeedAddCard.value = true;
+            }
+            // 如果闲家不需要补牌 庄补 
+            else {
+                bankerNeedAddCard.value = true;
             }
         }
 
@@ -192,6 +205,7 @@ export default {
 
                 roundStatus.value = ROUND_STATUS.FINISH;
 
+                console.log('log_补牌-庄：', bankerCards.value.join(' '), '得分：', bankerScore.value);
             }, 500);
         };
 
@@ -203,6 +217,8 @@ export default {
 
                 playerCards.value.push(newCard);
                 playerNeedAddCard.value = false;
+
+                console.log('log_补牌-闲：', playerCards.value.join(' '), '得分：', playerScore.value);
 
                 // 判断庄是否需要补牌
                 bankerNeedAddCard.value = checkBankerIfNeedAddCard(newCard);
@@ -280,7 +296,8 @@ export default {
             // 存储本轮对局结果
             resultList.value.push(roundResult);
             console.log('结果报表', resultList.value);
-
+            console.log(`log_结果：庄${roundResult.bankerScore} 闲${roundResult.playerScore} 胜负：${roundResult.res}`);
+            console.log('log_-----nextRound-----');
             showRoundResult.value = true;
 
             showContinueButton.value = true;
