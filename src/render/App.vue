@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- <RefreshCard></RefreshCard> -->
+    <RefreshCard></RefreshCard>
     <PushCard></PushCard>
   </div>
 </template>

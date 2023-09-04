@@ -1,9 +1,9 @@
 <template>
-    <!-- <div class="centered-top-element round-title">
+    <div v-if="!showRoundResult" class="centered-top-element round-title">
         {{ roundNumInfo }}
     </div>
 
-    <div v-if="showRoundResult" class="centered-top-element2 result-title" :class="roundResultInfo.class">
+    <div v-if="showRoundResult" class="centered-top-element result-title" :class="roundResultInfo.class">
         {{ roundResultInfo.text }}
     </div>
 
@@ -15,50 +15,52 @@
         <CardItem :type="'banker'" :text="bankerCards[1]" />
         <CardItem :type="'player'" v-if="playerCards[2]" :text="playerCards[2]" />
         <CardItem :type="'banker'" v-if="bankerCards[2]" :text="bankerCards[2]" />
-    </div> -->
+    </div>
 
-    庄{{ bankerScore }}点
-    闲{{ playerScore }}点
+    <!-- 庄{{ bankerScore }}点
+    闲{{ playerScore }}点 -->
+    <result :games="resultList" />
 
     <div class="centered-element" v-if="roundStatus === ROUND_STATUS.FINISH && !showRoundResult">
         <el-tooltip content="发牌" placement="top">
-            <!-- <pushIcon @click.stop="getCards" /> -->
-            <div @click="getCards">getCards</div>
+            <pushIcon @click.stop="getCards" />
+            <!-- <div @click="getCards">getCards</div> -->
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element"
         v-if="roundStatus === ROUND_STATUS.PENDING && !playerNeedAddCard && !bankerNeedAddCard">
         <el-tooltip content="开牌" placement="top">
-            <!-- <openIcon @click.stop="openCards" /> -->
-            <div @click="openCards">openCards</div>
+            <openIcon @click.stop="openCards" />
+            <!-- <div @click="openCards">openCards</div> -->
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="playerNeedAddCard">
         <el-tooltip content="闲补牌" placement="top">
-            <!-- <playerAddIcon @click.stop="playerAddCard" /> -->
-            <div @click="playerAddCard">playerAddCard</div>
+            <playerAddIcon @click.stop="playerAddCard" />
+            <!-- <div @click="playerAddCard">playerAddCard</div> -->
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="bankerNeedAddCard">
         <el-tooltip content="庄补牌" placement="top">
-            <!-- <bankerAddIcon @click.stop="bankerAddCard" /> -->
-            <div @click="bankerAddCard">bankerAddCard</div>
+            <bankerAddIcon @click.stop="bankerAddCard" />
+            <!-- <div @click="bankerAddCard">bankerAddCard</div> -->
         </el-tooltip>
     </div>
 
     <div class="centered-bottom-element" v-if="showContinueButton">
         <el-tooltip content="下一局" placement="top">
-            <!-- <continueIcon @click.stop="goNextRound" /> -->
-            <div @click="goNextRound">goNextRound</div>
+            <continueIcon @click.stop="goNextRound" />
+            <!-- <div @click="goNextRound">goNextRound</div> -->
         </el-tooltip>
     </div>
 </template>
     
 <script>
 import { ref, onMounted, nextTick, computed, watch } from 'vue';
+import Result from './Result.vue';
 import CardsBack from './CardsBack.vue';
 import CardItem from './CardItem.vue';
 import pushIcon from './icon/pushIcon.vue';
@@ -77,6 +79,7 @@ const ROUND_STATUS = {
 
 export default {
     components: {
+        Result,
         CardItem,
         CardsBack,
         pushIcon,
@@ -387,6 +390,7 @@ export default {
             roundStatus,
             roundNumInfo,
             roundResultInfo,
+            resultList,
 
             playerCards,
             bankerCards,
@@ -418,7 +422,7 @@ export default {
 }
 
 .round-title {
-    font-size: 48px;
+    font-size: 60px;
     font-weight: 550;
 }
 
@@ -441,7 +445,7 @@ export default {
 .centered-bottom-element {
     position: fixed;
     /* 使用 fixed 定位元素 */
-    top: 70%;
+    top: 80%;
     /* 垂直居中，相对于视口的 50% */
     left: 50%;
     /* 水平居中，相对于视口的 50% */
@@ -452,25 +456,13 @@ export default {
 .centered-top-element {
     position: fixed;
     /* 使用 fixed 定位元素 */
-    top: 20%;
+    top: 25%;
     /* 垂直居中，相对于视口的 50% */
     left: 50%;
     /* 水平居中，相对于视口的 50% */
     transform: translate(-50%, -50%);
     /* 使用 transform 属性来微调元素的位置 */
 }
-
-.centered-top-element2 {
-    position: fixed;
-    /* 使用 fixed 定位元素 */
-    top: 30%;
-    /* 垂直居中，相对于视口的 50% */
-    left: 50%;
-    /* 水平居中，相对于视口的 50% */
-    transform: translate(-50%, -50%);
-    /* 使用 transform 属性来微调元素的位置 */
-}
-
 
 .red-result {
     color: red;
