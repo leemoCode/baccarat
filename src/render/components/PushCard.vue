@@ -3,7 +3,7 @@
         {{ roundNumInfo }}
     </div>
 
-    <div v-if="showRoundResult" class="centered-bottom-element round-title" :class="roundResultInfo.class">
+    <div v-if="showRoundResult" class="centered-top-element2 result-title" :class="roundResultInfo.class">
         {{ roundResultInfo.text }}
     </div>
 
@@ -44,6 +44,12 @@
             <bankerAddIcon @click.stop="bankerAddCard" />
         </el-tooltip>
     </div>
+
+    <div class="centered-bottom-element" v-if="showContinueButton">
+        <el-tooltip content="下一局" placement="top">
+            <continueIcon @click.stop="goNextRound" />
+        </el-tooltip>
+    </div>
 </template>
     
 <script>
@@ -54,6 +60,7 @@ import pushIcon from './icon/pushIcon.vue';
 import openIcon from './icon/openIcon.vue';
 import bankerAddIcon from './icon/bankerAddIcon.vue';
 import playerAddIcon from './icon/playerAddIcon.vue';
+import continueIcon from './icon/continueIcon.vue';
 
 const { ipcRenderer } = require('electron');
 
@@ -70,6 +77,7 @@ export default {
         openIcon,
         playerAddIcon,
         bankerAddIcon,
+        continueIcon,
     },
     setup() {
         const roundStatus = ref(ROUND_STATUS.FINISH);
@@ -84,6 +92,7 @@ export default {
         const showCardsBack = ref(false);
         const showCardsFront = ref(false);
         const showRoundResult = ref(false);
+        const showContinueButton = ref(false);
 
         // 当前对局轮数
         const roundNum = ref(1);
@@ -274,13 +283,17 @@ export default {
 
             showRoundResult.value = true;
 
-            setTimeout(() => {
-                showRoundResult.value = false;
-                showCardsFront.value = false;
-                roundNum.value += 1;
-            }, 2000);
+            showContinueButton.value = true;
             return roundResult;
         };
+
+        const goNextRound = () => {
+            showRoundResult.value = false;
+            showCardsFront.value = false;
+            roundNum.value += 1;
+
+            showContinueButton.value = false;
+        }
 
         const hasDuplicateCards = (arr) => {
             const elementSet = new Set(); // 创建一个 Set 用于存储已经遍历过的元素
@@ -360,6 +373,9 @@ export default {
             showCardsBack,
             showCardsFront,
             showRoundResult,
+            showContinueButton,
+
+            goNextRound,
         };
     },
 };
@@ -373,6 +389,11 @@ export default {
 .round-title {
     font-size: 48px;
     font-weight: 550;
+}
+
+.result-title {
+    font-size: 64px;
+    font-weight: 600;
 }
 
 .centered-element {
@@ -400,6 +421,17 @@ export default {
 .centered-top-element {
     position: fixed;
     /* 使用 fixed 定位元素 */
+    top: 20%;
+    /* 垂直居中，相对于视口的 50% */
+    left: 50%;
+    /* 水平居中，相对于视口的 50% */
+    transform: translate(-50%, -50%);
+    /* 使用 transform 属性来微调元素的位置 */
+}
+
+.centered-top-element2 {
+    position: fixed;
+    /* 使用 fixed 定位元素 */
     top: 30%;
     /* 垂直居中，相对于视口的 50% */
     left: 50%;
@@ -407,6 +439,7 @@ export default {
     transform: translate(-50%, -50%);
     /* 使用 transform 属性来微调元素的位置 */
 }
+
 
 .red-result {
     color: red;
