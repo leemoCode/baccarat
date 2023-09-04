@@ -68,6 +68,7 @@ import playerAddIcon from './icon/playerAddIcon.vue';
 import continueIcon from './icon/continueIcon.vue';
 
 const { ipcRenderer } = require('electron');
+import { ElMessage } from 'element-plus'; // 引入Element Plus的消息提示组件
 
 const ROUND_STATUS = {
     PENDING: 0,
@@ -99,6 +100,8 @@ export default {
         const showRoundResult = ref(false);
         const showContinueButton = ref(false);
 
+        // 当前库中剩余牌数
+        const cardsNumberRemaining = ref(99);
         // 当前对局轮数
         const roundNum = ref(1);
         // 展示信息
@@ -305,6 +308,15 @@ export default {
         };
 
         const goNextRound = () => {
+            if (cardsNumberRemaining.value < 6) {
+                ElMessage({
+                    message: '剩余牌数不足，清洗牌',
+                    type: 'warning',
+                    duration: 2000
+                });
+
+                return;
+            }
             showRoundResult.value = false;
             showCardsFront.value = false;
             roundNum.value += 1;
@@ -363,7 +375,9 @@ export default {
         onMounted(() => {
             // 监听主进程的响应
             ipcRenderer.on('GET_CARD_RES', (event, data) => {
-                currCards.value.push(data);
+                currCards.value.push(data.card);
+                cardsNumberRemaining.value = data.number;
+                console.log('当前剩余牌数', cardsNumberRemaining.value);
             });
         });
 

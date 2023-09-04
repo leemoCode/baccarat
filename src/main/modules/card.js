@@ -22,6 +22,7 @@ function generateRandomDeck(n) {
 const n = 8 * 4; // 默认八副牌
 
 var currCardList = generateRandomDeck(n);
+console.log('当前排序:', currCardList);
 
 function refreshCard() {
     currCardList = generateRandomDeck(n);
@@ -29,8 +30,11 @@ function refreshCard() {
 }
 
 function pushCard() {
-    console.log('发牌', currCardList[0])
-    return currCardList.shift();
+    console.log('发牌', currCardList[0]);
+    return {
+        card: currCardList.shift(),
+        number: currCardList.length,
+    };
 }
 
 module.exports = {
