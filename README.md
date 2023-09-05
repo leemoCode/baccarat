@@ -25,7 +25,7 @@ node 14.18.1-x86
 
 - yarn build
 
-- /dist/data_build_setup_0.0.1.exe
+- /dist/baccarat_setup_0.0.1.exe
 
 淘宝镜像
 yarn config set ELECTRON_MIRROR "https://cdn.npm.taobao.org/dist/electron/"

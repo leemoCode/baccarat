@@ -1,6 +1,6 @@
 {
-  "name": "data_build",
-  "version": "1.1.1",
+  "name": "baccarat",
+  "version": "1.0.0",
   "main": "dist/main/build.js",
   "author": "Chloris",
   "license": "MIT",
@@ -15,7 +15,7 @@
     "rebuild": "./node_modules/.bin/electron-rebuild"
   },
   "build": {
-    "appId": "数据处理",
+    "appId": "baccarat",
     "electronDownload": {
       "mirror": "https://npm.taobao.org/mirrors/electron/"
     },
@@ -38,7 +38,7 @@
       }
     ],
     "mac": {
-      "artifactName": "研发效能数据分析工具_${version}.${ext}",
+      "artifactName": "baccarat_${version}.${ext}",
       "target": [
         "dmg"
       ]

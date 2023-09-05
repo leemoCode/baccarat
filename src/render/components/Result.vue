@@ -82,7 +82,7 @@ export default {
 }
 
 .result-dot.庄 {
-    background-color: red;
+    background-color: #c90c0d;
 }
 
 .result-dot.闲 {
@@ -95,7 +95,7 @@ export default {
 
 /* 为庄对子添加内部边框 */
 .banker-pair {
-    box-shadow: inset 0 0 0 2px white, inset 0 0 0 6px red;
+    box-shadow: inset 0 0 0 2px white, inset 0 0 0 6px #c90c0d;
 }
 
 /* 为闲对子添加内部边框 */
